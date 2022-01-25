@@ -1,14 +1,40 @@
 // Require `checkUsernameFree`, `checkUsernameExists` and `checkPasswordLength`
 // middleware functions from `auth-middleware.js`. You will need them here!
 const router = require('express').Router()
+const { add, findBy } = require('../users/users-model')
+const bcrypt = require('bcryptjs')
 
-router.post('/register', async (req, res, next) => {
-  res.json('register wired')
+const validatePayload = (req, res, next) => { next() }
+
+router.post('/register', validatePayload, async (req, res, next) => {
+  try {
+    const { username, password } = req.body
+    const hash = bcrypt.hashSync(password, 8)
+    const user = { username, password: hash }
+    const createdUser = await add(user)
+    res.status(201).json(createdUser)
+  } catch (err) {
+    next(err)
+  }
 })
-router.post('/login', async (req, res, next) => {
-res.json('login wired')
+
+router.post('/login', validatePayload, async (req, res, next) => {
+try {
+  const { username, password } = req.body
+  const [user] = await findBy({ username })
+
+  if (user && bcrypt.compareSync(password, user.password)) {
+    console.log(user)
+  }else {
+    next({ status: 401, message: 'bad credentials' })
+  }
+
+} catch (err) {
+  next(err)
+}
 })
-router.get('/logout', async (req, res, next) => {
+
+router.get('/logout', validatePayload, async (req, res, next) => {
   res.json('logout wired')
 })
 
