@@ -14,12 +14,16 @@ const cors = require("cors");
   The session can be persisted in memory (would not be adecuate for production)
   or you can use a session store like `connect-session-knex`.
  */
-
+const usersRouter = require('./users/users-router')
+const authRouter = require('./auth/auth-router')
 const server = express();
 
 server.use(helmet());
 server.use(express.json());
 server.use(cors());
+
+server.use('/api/auth', authRouter)
+server.use('/api/users',usersRouter)
 
 server.get("/", (req, res) => {
   res.json({ api: "up" });
