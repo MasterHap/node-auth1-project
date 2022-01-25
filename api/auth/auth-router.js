@@ -25,8 +25,10 @@ try {
 
   if (user && bcrypt.compareSync(password, user.password)) {
     console.log(user)
+    req.session.user = user
+    res.json({ message: `/welcome ${username}/i`})
   }else {
-    next({ status: 401, message: 'bad credentials' })
+    next({ status: 401, message: '/invalid credentials/i' })
   }
 
 } catch (err) {
